@@ -32,11 +32,11 @@ class Building extends React.Component {
 		fetch('http://localhost:8080/thermalSim', { 
 				method: 'GET', 
 				//mode: 'no-cors',
-				//headers: {
-		        //    'Content-Type': 'application/json',
-		        //},
+				headers: {
+		            'Content-Type': 'application/json',
+		        },
 			})
-			.then(blob => blob.text())
+			.then(blob => blob.json())
 			.then(data => {
 				this.setState({
 					apidata: data,
