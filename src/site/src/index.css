@@ -1,0 +1,35 @@
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.roomGrids {
+	background: #000;
+	color: #fff;
+	border: 5px solid #999;
+	width: 50%;
+	heigth: 100%;
+	float: left;
+}
+
+.toolBox {
+	background: #fff;
+	color: #000;
+	border: 5px solid #999;
+	width: 20%;
+	heigth: 100%;
+	float: left;
+}
+
+.optionBox {
+	background: #fff;
+	color: #000;
+	border: 5px solid #999;
+	width: 25%;
+	heigth: 100%;
+	float: left;
+}
