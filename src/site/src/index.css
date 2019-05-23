@@ -33,3 +33,18 @@ ol, ul {
 	heigth: 100%;
 	float: left;
 }
+
+.cell {
+  border: 1px solid #999;
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 32px;
+  margin-right: 0px;
+  margin-top:  0px;
+  padding: 0;
+  text-align: center;
+  width: 32px;
+  color: #fff;
+}
