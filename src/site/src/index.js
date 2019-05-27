@@ -20,7 +20,6 @@ class Building extends React.Component {
 	constructor(props) {
     	super(props);
     	this.state = {
-    			digest: null,
     			selection: null,
     			multiSel: false,
     			apidata: "",
@@ -28,8 +27,10 @@ class Building extends React.Component {
     }
 	
 	componentDidMount(){
+		const status = this.state.digest;
 		
-		fetch('http://localhost:8080/thermalSim', { 
+		setInterval( () => {
+			fetch('http://localhost:8080/thermalSim', { 
 				method: 'GET', 
 				//mode: 'no-cors',
 				headers: {
@@ -38,10 +39,14 @@ class Building extends React.Component {
 			})
 			.then(blob => blob.json())
 			.then(data => {
-				this.setState({
-					apidata: data,
-				})
+				if(data.digest !== status){
+					this.setState({
+						apidata: data,
+					});
+					this.forceUpdate();
+				}
 			});
+		}, 1000);
 	}
 	
 	render() {
@@ -50,8 +55,8 @@ class Building extends React.Component {
 		if(status.rooms){
 			rom = status.rooms.map((data,room) => {
 				return (
-					<div>
-						<Room data={data} />
+					<div key={data.id}>
+						<Room key={"ROOM"+data.id} data={data} />
 					<br />
 					</div>
 				);
@@ -72,20 +77,24 @@ class Room extends React.Component {
     	};
     }
 	
+    componentWillReceiveProps(nextProps) {
+    	  this.setState({ data: nextProps.data });  
+    }
+    
 	render() {
 		const status = this.state.data;
 		
 		let grid = [];
 		for(let i = (status.h-1) ; i >= 0 ; i--){
 			for(let j = 0 ; j < status.w ; j++){
-				grid.push(<Cell data={status.cells[i*status.w+j]} room={status.id} cellid={i*status.w+j} />);
+				grid.push(<Cell key={status.id+""+i*status.w+j} data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+""+i*status.w+j} />);
 			}
 			grid.push(<br />);
 			grid.push(<br />);
 		}
 		
 		return (
-				<div>
+				<div key={"DIV-"+status.id}>
 				{status.id} : {status.desc} <br /> {grid}
 				</div>
 		);
@@ -102,6 +111,14 @@ class Cell extends React.Component {
     	};
     }
 	
+    componentWillReceiveProps(nextProps) {
+  	  this.setState({ data: nextProps.data     ,
+  		  			  room: nextProps.room     ,
+  		  			  cellid: nextProps.cellid ,
+  		  			
+  	  });  
+   }
+    
 	render() {
 		const status = this.state.data;
 		const temp = this.state.data.temp_counters;
@@ -150,10 +167,10 @@ class Cell extends React.Component {
 		
 		background = colormap[lerp];
 		
-		if(status.flame==1){
+		if(status.flame===1){
 			background = "red";
 			text = "***";
-		}else if(status.spreadable==0){
+		}else if(status.spreadable===0){
 			background = "gray";
 			text = "###"
 		}else if(status.ignition>0){
@@ -170,7 +187,7 @@ class Cell extends React.Component {
       >
 	    {text}
       </button>
-    	</span>
+      </span>
     );
   }
 }
