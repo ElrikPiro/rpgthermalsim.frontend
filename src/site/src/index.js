@@ -149,10 +149,10 @@ class Cell extends React.Component {
 			"#A32800",
 			"#A21500",
 		]
-		if(temp <= -273) lerp = 0;
-		else if(temp > 500) lerp = colormap.length-1;
+		if(temp <= -100) lerp = 0;
+		else if(temp > 200) lerp = colormap.length-1;
 		else{
-			let tempmap = (temp+273)/773;
+			let tempmap = (temp+100)/300;
 			lerp = Math.floor(tempmap*(colormap.length-1));
 			console.log("tempmap:" + tempmap);
 		}
