@@ -103,19 +103,11 @@ class Cell extends React.Component {
     }
 	
 	render() {
+		const status = this.state.data;
 		const temp = this.state.data.temp_counters;
 		let background = "000";
-		let text = null;
+		let text = Math.floor(temp);
 		
-		/*
-		 * if(this.temp_counters<=-273) lerp = 0;
-		else if(this.temp_counters > 500) lerp = LERP.length-1;
-		else {
-			float tempmap = (float) (this.temp_counters+273)/773;
-			lerp = (int) Math.floor(tempmap*(LERP.length-1));
-		}
-		 */
-		//29 colors
 		let lerp;
 		let colormap = [
 			"#0039AD",
@@ -154,13 +146,20 @@ class Cell extends React.Component {
 		else{
 			let tempmap = (temp+100)/300;
 			lerp = Math.floor(tempmap*(colormap.length-1));
-			console.log("tempmap:" + tempmap);
 		}
 		
 		background = colormap[lerp];
-		console.log("temp:" + temp);
-		console.log("lerp:" + lerp);
-		console.log("bg:" + background);
+		
+		if(status.flame==1){
+			background = "red";
+			text = "***";
+		}else if(status.spreadable==0){
+			background = "gray";
+			text = "###"
+		}else if(status.ignition>0){
+			background = "blue";
+			text = status.ignition;
+		}
 		
     return (
     	<span>
@@ -169,7 +168,7 @@ class Cell extends React.Component {
 	    onClick={() => this.props.onClick()}
     	style={{background: background}}
       >
-	    {Math.floor(temp)}
+	    {text}
       </button>
     	</span>
     );
