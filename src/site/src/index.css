@@ -1,0 +1,50 @@
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.roomGrids {
+	background: #000;
+	color: #fff;
+	border: 5px solid #999;
+	width: 50%;
+	heigth: 100%;
+	float: left;
+}
+
+.toolBox {
+	background: #fff;
+	color: #000;
+	border: 5px solid #999;
+	width: 20%;
+	heigth: 100%;
+	float: left;
+}
+
+.optionBox {
+	background: #fff;
+	color: #000;
+	border: 5px solid #999;
+	width: 25%;
+	heigth: 100%;
+	float: left;
+}
+
+.cell {
+  border: 1px solid #999;
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 32px;
+  margin-right: 0px;
+  margin-top:  0px;
+  padding: 0;
+  text-align: center;
+  width: 32px;
+  color: #fff;
+}
