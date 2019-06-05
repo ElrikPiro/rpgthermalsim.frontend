@@ -4,6 +4,10 @@ import './index.css';
 
 var selectedTool = 0;
 var options = {};
+var auxiliarData = {
+		numit: 1,
+};
+
 var tools = [
 	{
 		name: "Select",
@@ -137,7 +141,7 @@ class Room extends React.Component {
 		let grid = [];
 		for(let i = (status.h-1) ; i >= 0 ; i--){
 			for(let j = 0 ; j < status.w ; j++){
-				grid.push(<div key={status.id+""+i*status.w+j}><Cell data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+":"+i+","+j} /></div>);
+				grid.push(<div key={status.id+""+i*status.w+j}><Cell data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+":"+j+","+i} /></div>);
 			}
 			grid.push(<br />);
 			grid.push(<br />);
@@ -366,6 +370,33 @@ function iterar(obj) {
 	obj.setState({
 		selected: selectedTool,
 	});
+	
+	
+	let optionsData = [];
+	
+	optionsData.push(
+		<div>
+			<hr />
+			<p><b>Iterate function selected.</b></p>
+			<p>Number of iterations: <input name="numit" type="number" onChange={(e) => auxiliarData.numit = e.target.value } /></p>
+			<button onClick={()=>{
+				fetch("http://localhost:8080/thermalSim?command=iterate "+auxiliarData.numit, { 
+					method: 'GET', 
+					//mode: 'no-cors',
+					headers: {
+			            'Content-Type': 'application/json',
+			        },
+				});
+			}}>Iterate!</button>
+		</div>
+	);
+	
+	let updateoptions = (options) => {
+		options.setState({
+			rend: optionsData,
+		});
+	}
+	updateoptions(options);
 }
 
 function buildRoom(obj) {
