@@ -1,6 +1,55 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+
+var selectedTool = 0;
+var tools = [
+	{
+		name: "Select",
+		onClick: (obj) => seleccionar(obj),
+	},
+	{
+		name: "Iterate",
+		onClick: (obj) => iterar(obj),
+	},
+	{
+		name: "Build",
+		onClick: (obj) => buildRoom(obj),
+	},
+	{
+		name: "Draw",
+		onClick: (obj) => startDrawMode(obj),
+	},
+	{
+		name: "Link",
+		onClick: (obj) => startLinkMode(obj),
+	},
+	{
+		name: "Ignite",
+		onClick: (obj) => ignite(obj),
+	},
+	{
+		name: "Deflagrate",
+		onClick: (obj) => startDeflagMode(obj),
+	},
+	{
+		name: "Sink",
+		onClick: (obj) => startSinkMode(obj),
+	},
+	{
+		name: "Save",
+		onClick: (obj) => startSaveMode(obj),
+	},
+	{
+		name: "Load",
+		onClick: (obj) => startLoadMode(obj),
+	},
+	{
+		name: "New",
+		onClick: (obj) => applyNew(obj),
+	},
+]
+
 /*
 class Template extends React.Component {
     constructor(props) {
@@ -87,7 +136,7 @@ class Room extends React.Component {
 		let grid = [];
 		for(let i = (status.h-1) ; i >= 0 ; i--){
 			for(let j = 0 ; j < status.w ; j++){
-				grid.push(<Cell key={status.id+""+i*status.w+j} data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+""+i*status.w+j} />);
+				grid.push(<div key={status.id+""+i*status.w+j}><Cell data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+""+i*status.w+j} /></div>);
 			}
 			grid.push(<br />);
 			grid.push(<br />);
@@ -182,7 +231,7 @@ class Cell extends React.Component {
     	<span>
     	<button 
 	    className="cell" 
-	    onClick={() => this.props.onClick()}
+	    onClick={() => cellClicked(this.state)}
     	style={{background: background}}
       >
 	    {text}
@@ -192,14 +241,129 @@ class Cell extends React.Component {
   }
 }
 
+class Toolbox extends React.Component {
+    constructor(props) {
+    	super(props);
+    	this.state = {
+    			selected : 0,
+    	}
+    	//this.state = {};
+    }
+	
+	render() {
+		let sel = this.state.selected;
+		let cn = "tool";
+		let grid = [];
+		for(let i = 0 ; i < tools.length ; i++){
+			if(i===sel) cn = "seltool";
+			else cn = "tool";
+			grid.push(
+				<div key={"tool-"+i}><button
+					className={cn}
+					onClick={() => tools[i].onClick(this)}
+					
+				/>
+				{tools[i].name}
+				</div>
+			);
+		}
+		
+    return (
+      <div>
+      	{grid}
+      </div>
+    );
+  }
+}
+
 // ========================================
 
 ReactDOM.render(
   <div className="General">
   		<div className="roomGrids"><Building /></div>
-  		<div className="toolBox">SAMPLE TEXT</div>
+  		<div className="toolBox"><Toolbox /></div>
   		<div className="optionBox">SAMPLE TEXT</div>
   </div>,
   document.getElementById('root')
 );
 
+function cellClicked(cellobj) {
+	console.log("CLICK");
+}
+
+function seleccionar(obj) {
+	selectedTool = 0;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function iterar(obj) {
+	selectedTool = 1;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function buildRoom(obj) {
+	selectedTool = 2;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function startDrawMode(obj) {
+	selectedTool = 3;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function startLinkMode(obj) {
+	selectedTool = 4;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function ignite(obj) {
+	selectedTool = 5;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function startDeflagMode(obj) {
+	selectedTool = 6;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function startSinkMode(obj) {
+	selectedTool = 7;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function startSaveMode(obj) {
+	selectedTool = 8;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function startLoadMode(obj) {
+	selectedTool = 9;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
+
+function applyNew(obj) {
+	selectedTool = 10;
+	obj.setState({
+		selected: selectedTool,
+	});
+}
