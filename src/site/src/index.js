@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 var selectedTool = 0;
+var options = {};
 var tools = [
 	{
 		name: "Select",
@@ -136,7 +137,7 @@ class Room extends React.Component {
 		let grid = [];
 		for(let i = (status.h-1) ; i >= 0 ; i--){
 			for(let j = 0 ; j < status.w ; j++){
-				grid.push(<div key={status.id+""+i*status.w+j}><Cell data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+""+i*status.w+j} /></div>);
+				grid.push(<div key={status.id+""+i*status.w+j}><Cell data={status.cells[i*status.w+j]} room={status.id} cellid={status.id+":"+i+","+j} /></div>);
 			}
 			grid.push(<br />);
 			grid.push(<br />);
@@ -231,7 +232,7 @@ class Cell extends React.Component {
     	<span>
     	<button 
 	    className="cell" 
-	    onClick={() => cellClicked(this.state)}
+	    onClick={() => cellClicked(this)}
     	style={{background: background}}
       >
 	    {text}
@@ -276,19 +277,72 @@ class Toolbox extends React.Component {
   }
 }
 
+class OptionBox extends React.Component {
+    constructor(props) {
+    	super(props);
+    	this.state = {
+    			cell     : null,
+    			rend	 : [],
+    	};
+    }
+	
+	render() {
+		options = this;
+		let torend = this.state.rend;
+		let selcell = this.state.cell;
+		let cellInfo = [];
+		if(selcell !== null){
+			let selcell = this.state.cell.state;
+			cellInfo.push(
+					<div key="cellInfo">
+						<p>Selected Cell: {selcell.cellid}</p>
+					</div>
+			);
+			
+			cellInfo.push(<div key="cellInfo2"><p>The cell current temperature is {selcell.data.temp_counters} ºC</p></div>);
+			
+			if(selcell.data.flame === 1) 
+				cellInfo.push(<div key="cellInfo3"><p>The cell is on fire and will burn during the next {selcell.data.ignition*-1} iterations</p></div>);
+			else if(selcell.data.ignition > 0)
+				cellInfo.push(<div key="cellInfo4"><p>The cell will set on fire at {selcell.data.ignition*100} degrees</p></div>);
+			
+			if(selcell.data.spreadable === 0)
+				cellInfo.push(<div key="cellInfo5"><p>The cell offers a heat conductivity of {selcell.data.insulation * 100} %</p></div>);
+		}else{
+			cellInfo.push(
+					<div key="Options">
+						<p>No Cell is selected.</p>
+					</div>
+			);
+		}
+    return (
+    	<div>
+    	{cellInfo}
+    	{torend}
+    	</div>
+    );
+  }
+}
+
 // ========================================
 
 ReactDOM.render(
   <div className="General">
   		<div className="roomGrids"><Building /></div>
   		<div className="toolBox"><Toolbox /></div>
-  		<div className="optionBox">SAMPLE TEXT</div>
+  		<div className="optionBox"><OptionBox /></div>
   </div>,
   document.getElementById('root')
 );
 
 function cellClicked(cellobj) {
-	console.log("CLICK");
+	let updateoptions = (options) => {
+		options.setState({
+			cell: cellobj,
+		});
+	}
+	
+	updateoptions(options);
 }
 
 function seleccionar(obj) {
@@ -296,6 +350,15 @@ function seleccionar(obj) {
 	obj.setState({
 		selected: selectedTool,
 	});
+	
+	let updateoptions = (options) => {
+		options.setState({
+			cell: null,
+			rend: [],
+		});
+	}
+	updateoptions(options);
+	
 }
 
 function iterar(obj) {
