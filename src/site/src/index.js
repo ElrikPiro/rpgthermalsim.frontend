@@ -6,6 +6,16 @@ var selectedTool = 0;
 var options = {};
 var auxiliarData = {
 		numit: 1,
+		build: {
+			name : null,
+			w	 : null,
+			h	 : null,
+		},
+		draw: {
+			tool: null,
+			params: []
+		}
+		
 };
 
 var tools = [
@@ -287,12 +297,14 @@ class OptionBox extends React.Component {
     	this.state = {
     			cell     : null,
     			rend	 : [],
+    			subopts	 : [],
     	};
     }
 	
 	render() {
 		options = this;
 		let torend = this.state.rend;
+		let subopts = this.state.subopts;
 		let selcell = this.state.cell;
 		let cellInfo = [];
 		if(selcell !== null){
@@ -323,6 +335,7 @@ class OptionBox extends React.Component {
     	<div>
     	{cellInfo}
     	{torend}
+    	{subopts}
     	</div>
     );
   }
@@ -340,6 +353,16 @@ ReactDOM.render(
 );
 
 function cellClicked(cellobj) {
+	let fetchcommand = (c) => {
+		fetch("http://localhost:8080/thermalSim"+c, { 
+			method: 'GET', 
+			//mode: 'no-cors',
+			headers: {
+	            'Content-Type': 'application/json',
+	        },
+		});
+	}
+	
 	let updateoptions = (options) => {
 		options.setState({
 			cell: cellobj,
@@ -347,6 +370,40 @@ function cellClicked(cellobj) {
 	}
 	
 	updateoptions(options);
+	let cellroom = cellobj.state.room;
+	let cellx = cellobj.state.cellid.split(":")[1].split(",")[0];
+	let celly = cellobj.state.cellid.split(":")[1].split(",")[1];
+	
+	let command = "?command=";
+	
+	switch(selectedTool){
+		case 3://Draw mode
+			command = command + auxiliarData.draw.tool + " " +
+			cellroom + " " +
+			cellx + " " +
+			celly + " ";
+			if(auxiliarData.draw.tool==="set"){
+				command = command + 
+				auxiliarData.draw.params[0]+ " " +
+				auxiliarData.draw.params[1]+ " " +
+				auxiliarData.draw.params[2];
+			}else if(auxiliarData.draw.tool==="block"){
+				command = command +
+				auxiliarData.draw.params[0]/100.0;
+			}else if(auxiliarData.draw.tool==="put"){
+				command = command +
+				auxiliarData.draw.params[0] + " ";
+				if(auxiliarData.draw.params[1]!=100){
+					command = command +
+					auxiliarData.draw.params[1]/100.0;
+				}
+				
+			}
+			
+			fetchcommand(command);
+			break;
+	}
+	
 }
 
 function seleccionar(obj) {
@@ -359,6 +416,7 @@ function seleccionar(obj) {
 		options.setState({
 			cell: null,
 			rend: [],
+			subopts: [],
 		});
 	}
 	updateoptions(options);
@@ -378,7 +436,7 @@ function iterar(obj) {
 		<div>
 			<hr />
 			<p><b>Iterate function selected.</b></p>
-			<p>Number of iterations: <input name="numit" type="number" onChange={(e) => auxiliarData.numit = e.target.value } /></p>
+			<p>Number of iterations: <input className="inputnum" name="numit" type="number" onChange={(e) => auxiliarData.numit = e.target.value } /></p>
 			<button onClick={()=>{
 				fetch("http://localhost:8080/thermalSim?command=iterate "+auxiliarData.numit, { 
 					method: 'GET', 
@@ -394,6 +452,7 @@ function iterar(obj) {
 	let updateoptions = (options) => {
 		options.setState({
 			rend: optionsData,
+			subopts: [],
 		});
 	}
 	updateoptions(options);
@@ -404,6 +463,34 @@ function buildRoom(obj) {
 	obj.setState({
 		selected: selectedTool,
 	});
+	let optionsData = [];
+	
+	optionsData.push(
+		<div>
+			<hr />
+			<p><b>Build function selected.</b></p>
+			<p>Name of the room: <input type="text" onChange={(e) => auxiliarData.build.name = e.target.value } /></p>
+			<p>witdh: <input className="inputnum" type="number" onChange={(e) => auxiliarData.build.w = e.target.value } />
+			   height: <input className="inputnum" type="number" onChange={(e) => auxiliarData.build.h = e.target.value } /></p>
+			<button onClick={()=>{
+				fetch("http://localhost:8080/thermalSim?command=build "+auxiliarData.build.name+" "+auxiliarData.build.w+" "+auxiliarData.build.h, { 
+					method: 'GET', 
+					//mode: 'no-cors',
+					headers: {
+			            'Content-Type': 'application/json',
+			        },
+				});
+			}}>Build!</button>
+		</div>
+	);
+	
+	let updateoptions = (options) => {
+		options.setState({
+			rend: optionsData,
+			subopts: [],
+		});
+	}
+	updateoptions(options);
 }
 
 function startDrawMode(obj) {
@@ -411,6 +498,81 @@ function startDrawMode(obj) {
 	obj.setState({
 		selected: selectedTool,
 	});
+	let optionsData = [];
+	
+	optionsData.push(
+		<div>
+			<hr />
+			<p><b>Draw function selected.</b></p>
+			<p>Choose a tool:</p>
+			
+			<select name="subtool" onChange={(e) => {
+					let optionsExtra = [];
+					auxiliarData.draw.tool = e.target.value;
+					auxiliarData.draw.params = [0,0,0]
+					if(auxiliarData.draw.tool === "set"){
+						optionsExtra.push(
+								<div>
+									<hr/>
+									<p>(Advanced) Setting cell options:</p>
+									<p>Flame: <input min="0" max="1" className="inputnum" type="number" onChange={(e) => auxiliarData.draw.params[0] = e.target.value }/></p>
+									<p>Ignition: <input className="inputnum" type="number" onChange={(e) => auxiliarData.draw.params[1] = e.target.value }/></p>
+									<p>Temperature: <input className="inputnum" type="number" onChange={(e) => auxiliarData.draw.params[2] = e.target.value }/></p>
+								</div>
+							);
+					}else if(auxiliarData.draw.tool === "block"){
+						auxiliarData.draw.params[0] = 0;
+						optionsExtra.push(
+								<div>
+									<hr/>
+									<p>Blocking cell conductivity:</p>
+									<p>Conductivity (0% by default): <input min="0" max="100" className="inputnum" type="number" onChange={(e) => auxiliarData.draw.params[0] = e.target.value }/></p>
+								</div>
+						);
+					}else if(auxiliarData.draw.tool === "unblock"){
+						optionsExtra.push(
+								<div>
+									<hr/>
+									<p>Click on a blocked cell to unlock it.</p>
+								</div>
+						);
+					}else if(auxiliarData.draw.tool === "put"){
+						auxiliarData.draw.params[0] = 1;
+						auxiliarData.draw.params[1] = 100;
+						optionsExtra.push(
+								<div>
+									<hr/>
+									<p>Putting an ignitable object:</p>
+									<p>ignition temperature (each unit equals 100ºC) : <input min="0" className="inputnum" type="number" onChange={(e) => auxiliarData.draw.params[0] = e.target.value }/></p>
+									<p>Conductivity (100% by default): <input min="0" max="100" className="inputnum" type="number" onChange={(e) => auxiliarData.draw.params[1] = e.target.value }/></p>
+								</div>
+						);
+					}
+					
+					let uoptextra = (options) => {
+						options.setState({
+							subopts: optionsExtra,
+						});
+					}
+					uoptextra(options);
+				}
+			}>
+				<option value=""></option>
+				<option value="set">Set cell options (Advanced)</option>
+	        	<option value="block">Block heat spreading</option>
+	        	<option value="unblock">Unblock heat spreading</option>
+	        	<option value="put">Set a burning flashpoint</option>
+	        </select><br />
+		</div>
+	);
+	
+	let updateoptions = (options) => {
+		options.setState({
+			rend: optionsData,
+			subopts: [],
+		});
+	}
+	updateoptions(options);
 }
 
 function startLinkMode(obj) {
